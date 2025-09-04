@@ -186,3 +186,41 @@ impl Default for RefHandler {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_ref_handler() {
+        let mut ref_handler = RefHandler::new();
+        
+        // Add a reference
+        let hash = "1234567890abcdef".repeat(2).chars().take(40).collect::<String>();
+        ref_handler.add_ref("refs/heads/main".to_string(), hash.clone(), false);
+        
+        // Get the reference
+        let git_ref = ref_handler.get_ref("refs/heads/main").unwrap();
+        assert_eq!(git_ref.name, "refs/heads/main");
+        assert_eq!(git_ref.target, hash);
+        assert!(!git_ref.is_symbolic);
+        
+        // List branches
+        let branches = ref_handler.list_branches();
+        assert_eq!(branches.len(), 1);
+        assert_eq!(branches[0].name, "refs/heads/main");
+    }
+    
+    #[test]
+    fn test_ref_resolution() {
+        let mut ref_handler = RefHandler::new();
+        
+        let hash = "1234567890abcdef".repeat(2).chars().take(40).collect::<String>();
+        ref_handler.add_ref("refs/heads/main".to_string(), hash.clone(), false);
+        ref_handler.add_ref("HEAD".to_string(), "refs/heads/main".to_string(), true);
+        
+        // Resolve HEAD to the actual hash
+        let resolved = ref_handler.resolve_ref("HEAD").unwrap();
+        assert_eq!(resolved, hash);
+    }
+}

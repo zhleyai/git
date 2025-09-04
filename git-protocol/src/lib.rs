@@ -2,6 +2,8 @@ pub mod pack;
 pub mod refs;
 pub mod objects;
 pub mod protocol;
+#[cfg(test)]
+mod tests;
 
 pub use protocol::ProtocolHandler;
 

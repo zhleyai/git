@@ -248,3 +248,33 @@ impl Default for ObjectHandler {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ObjectType;
+    
+    #[test]
+    fn test_git_object_creation() {
+        let handler = ObjectHandler::new();
+        
+        let content = b"Hello, World!";
+        let blob = handler.create_blob(content).unwrap();
+        
+        assert_eq!(blob.obj_type, ObjectType::Blob);
+        assert_eq!(blob.size, content.len());
+        assert_eq!(blob.content, content);
+        assert_eq!(blob.id.len(), 40); // SHA-1 is 40 hex characters
+    }
+    
+    #[test]
+    fn test_hash_calculation() {
+        let handler = ObjectHandler::new();
+        let content = b"test content";
+        let hash = handler.calculate_hash(ObjectType::Blob, content).unwrap();
+        
+        // Should be a valid 40-character SHA-1 hex string
+        assert_eq!(hash.len(), 40);
+        assert!(hash.chars().all(|c| c.is_ascii_hexdigit()));
+    }
+}

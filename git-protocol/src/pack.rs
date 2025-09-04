@@ -138,3 +138,33 @@ impl Default for PackParser {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_pack_header_parsing() {
+        let parser = PackParser::new();
+        
+        // Test header parsing
+        let header_data = b"PACK\x00\x00\x00\x02\x00\x00\x00\x01"; // version 2, 1 object
+        let (_, header) = parser.parse_header(header_data).unwrap();
+        
+        assert_eq!(&header.signature, b"PACK");
+        assert_eq!(header.version, 2);
+        assert_eq!(header.num_objects, 1);
+    }
+    
+    #[test]
+    fn test_object_type_parsing() {
+        let parser = PackParser::new();
+        
+        assert_eq!(parser.get_object_type(1).unwrap(), ObjectType::Commit);
+        assert_eq!(parser.get_object_type(2).unwrap(), ObjectType::Tree);
+        assert_eq!(parser.get_object_type(3).unwrap(), ObjectType::Blob);
+        assert_eq!(parser.get_object_type(4).unwrap(), ObjectType::Tag);
+        
+        assert!(parser.get_object_type(99).is_err());
+    }
+}
