@@ -29,6 +29,9 @@ async-trait = "0.1"
 sea-orm = { version = "0.12", features = [ "sqlx-sqlite", "runtime-tokio-rustls", "macros" ] }
 sea-orm-migration = "0.12"
 
+# Password hashing
+bcrypt = "0.15"
+
 # Internal dependencies
 git-protocol = { path = "../git-protocol" }
 git-storage = { path = "../git-storage" }

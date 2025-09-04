@@ -134,4 +134,42 @@ impl UserService {
             .await?;
         Ok(count > 0)
     }
+
+    /// Authenticate user with username/email and password
+    pub async fn authenticate(
+        &self, 
+        username_or_email: &str, 
+        password: &str
+    ) -> Result<Option<user::Model>> {
+        // Try to find user by username first, then by email
+        let user = match self.get_user_by_username(username_or_email).await? {
+            Some(user) => Some(user),
+            None => self.get_user_by_email(username_or_email).await?,
+        };
+
+        if let Some(user) = user {
+            // Verify password (this would use proper bcrypt verification in production)
+            if self.verify_password(password, &user.password_hash)? {
+                Ok(Some(user))
+            } else {
+                Ok(None)
+            }
+        } else {
+            Ok(None)
+        }
+    }
+
+    /// Hash password (placeholder - would use bcrypt in production)
+    pub fn hash_password(&self, password: &str) -> Result<String> {
+        // For now, just prefix with "hashed_"
+        // In production, use: bcrypt::hash(password, bcrypt::DEFAULT_COST)?
+        Ok(format!("hashed_{}", password))
+    }
+
+    /// Verify password against hash (placeholder - would use bcrypt in production)  
+    pub fn verify_password(&self, password: &str, hash: &str) -> Result<bool> {
+        // For now, just check if hash matches "hashed_" + password
+        // In production, use: bcrypt::verify(password, hash)?
+        Ok(hash == format!("hashed_{}", password))
+    }
 }

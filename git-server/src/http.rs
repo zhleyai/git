@@ -315,7 +315,10 @@ pub async fn create_user(
     }
     
     // In production, hash the password properly
-    let password_hash = format!("hashed_{}", req.password); // Placeholder
+    let password_hash = match state.user_service.hash_password(&req.password) {
+        Ok(hash) => hash,
+        Err(_) => return Ok(HttpResponse::InternalServerError().json("Failed to process password")),
+    };
     
     match state
         .user_service

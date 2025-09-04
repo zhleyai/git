@@ -1,6 +1,7 @@
 mod config;
 mod http;
 mod ssh;
+mod auth;
 
 use actix_files::Files;
 use actix_web::{web, App, HttpServer};
@@ -89,6 +90,14 @@ async fn main() -> anyhow::Result<()> {
             // API routes
             .service(
                 web::scope("/api")
+                    // Authentication routes
+                    .service(
+                        web::scope("/auth")
+                            .service(auth::login)
+                            .service(auth::register)
+                            .service(auth::logout)
+                            .service(auth::get_current_user)
+                    )
                     // Repository routes
                     .service(http::list_repositories)
                     .service(http::get_repository)
