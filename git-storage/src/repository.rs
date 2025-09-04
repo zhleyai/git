@@ -8,6 +8,7 @@ use std::fs;
 use std::path::PathBuf;
 use uuid::Uuid;
 
+#[derive(Clone)]
 pub struct RepositoryService {
     db: DatabaseConnection,
     blob_storage_path: PathBuf,

@@ -1,10 +1,11 @@
 use crate::{GitObject, ObjectType};
 use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use sha1::{Digest, Sha1};
 
 /// Git commit object
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Commit {
     pub tree: String,
     pub parents: Vec<String>,
@@ -16,7 +17,7 @@ pub struct Commit {
 }
 
 /// Git tree entry
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TreeEntry {
     pub mode: String,    // e.g., "100644", "040000"
     pub name: String,
@@ -24,19 +25,19 @@ pub struct TreeEntry {
 }
 
 /// Git tree object
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Tree {
     pub entries: Vec<TreeEntry>,
 }
 
 /// Git blob object
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Blob {
     pub content: Vec<u8>,
 }
 
 /// Git tag object
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Tag {
     pub object: String,
     pub obj_type: String,
