@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import axios from 'axios'
+import UserPage from './components/UserPage'
+import WarehousePage from './components/WarehousePage'
+import ExplorationPage from './components/ExplorationPage'
 import './App.css'
 
 interface Repository {
@@ -62,6 +65,9 @@ function App() {
           <h1>Git Server</h1>
           <nav>
             <Link to="/">Repositories</Link>
+            <Link to="/users">Users</Link>
+            <Link to="/warehouse">Warehouse</Link>
+            <Link to="/explore">Explore</Link>
           </nav>
         </header>
 
@@ -140,6 +146,9 @@ function App() {
                 </div>
               </div>
             } />
+            <Route path="/users" element={<UserPage />} />
+            <Route path="/warehouse" element={<WarehousePage />} />
+            <Route path="/explore" element={<ExplorationPage />} />
           </Routes>
         </main>
       </div>

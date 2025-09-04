@@ -4,6 +4,8 @@ mod ssh;
 
 use actix_files::Files;
 use actix_web::{web, App, HttpServer};
+use actix_session::{config::PersistentSession, storage::CookieSessionStore, SessionMiddleware};
+use actix_web::cookie::{Key, time::Duration};
 use anyhow::Context;
 use git_storage::{init_db, run_migrations, RepositoryService, UserService};
 use std::sync::Arc;
@@ -66,8 +68,17 @@ async fn main() -> anyhow::Result<()> {
     info!("Starting HTTP server on {}", bind_address);
 
     HttpServer::new(move || {
+        // Create session key (in production, this should be loaded from env or config)
+        let secret_key = Key::generate();
+        
         App::new()
             .app_data(web::Data::new(app_state.clone()))
+            // Session middleware
+            .wrap(
+                SessionMiddleware::builder(CookieSessionStore::default(), secret_key)
+                    .session_lifecycle(PersistentSession::default().session_ttl(Duration::hours(24)))
+                    .build(),
+            )
             // Git HTTP protocol routes
             .service(
                 web::scope("/git")
