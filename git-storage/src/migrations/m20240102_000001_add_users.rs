@@ -25,25 +25,22 @@ impl MigrationTrait for Migration {
             )
             .await?;
 
-        // Add owner_id and is_private columns to repositories table
+        // Add owner_id column to repositories table  
         manager
             .alter_table(
                 Table::alter()
                     .table(Repository::Table)
                     .add_column(ColumnDef::new(Repository::OwnerId).uuid())
-                    .add_column(ColumnDef::new(Repository::IsPrivate).boolean().not_null().default(false))
                     .to_owned(),
             )
             .await?;
 
-        // Add foreign key constraint for repository owner
+        // Add is_private column to repositories table
         manager
-            .create_foreign_key(
-                ForeignKey::create()
-                    .name("fk-repository-owner")
-                    .from(Repository::Table, Repository::OwnerId)
-                    .to(User::Table, User::Id)
-                    .on_delete(ForeignKeyAction::SetNull)
+            .alter_table(
+                Table::alter()
+                    .table(Repository::Table)
+                    .add_column(ColumnDef::new(Repository::IsPrivate).boolean().not_null().default(false))
                     .to_owned(),
             )
             .await?;
@@ -52,23 +49,21 @@ impl MigrationTrait for Migration {
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Drop foreign key constraint
-        manager
-            .drop_foreign_key(
-                ForeignKey::drop()
-                    .name("fk-repository-owner")
-                    .table(Repository::Table)
-                    .to_owned(),
-            )
-            .await?;
-
         // Remove columns from repositories table
         manager
             .alter_table(
                 Table::alter()
                     .table(Repository::Table)
-                    .drop_column(Repository::OwnerId)
                     .drop_column(Repository::IsPrivate)
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .alter_table(
+                Table::alter()
+                    .table(Repository::Table)
+                    .drop_column(Repository::OwnerId)
                     .to_owned(),
             )
             .await?;

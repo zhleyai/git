@@ -123,8 +123,8 @@ impl RepositoryService {
             // Write blob content to file
             fs::write(&blob_path, &content)?;
             
-            // Store only metadata in database
-            (None, Some(blob_path.to_string_lossy().to_string()))
+            // Store empty content in database and blob path
+            (Some(Vec::new()), Some(blob_path.to_string_lossy().to_string()))
         } else {
             // Store commit, tree, tag objects in database
             (Some(content), None)
@@ -161,6 +161,10 @@ impl RepositoryService {
                     }
                 }
             } else if let Some(content) = obj.content.clone() {
+                // For non-blob objects or if blob_path is not set, use content from DB
+                if content.is_empty() && obj.object_type == "blob" {
+                    return Err(anyhow!("Blob content not found in filesystem or database"));
+                }
                 content
             } else {
                 return Err(anyhow!("Object content not found"));
