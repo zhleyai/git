@@ -24,6 +24,7 @@ actix-session = { version = "0.9", features = ["cookie-session"] }
 russh = "0.44"
 russh-keys = "0.44"
 async-trait = "0.1"
+rand = "0.8"
 
 # Database
 sea-orm = { version = "0.12", features = [ "sqlx-sqlite", "runtime-tokio-rustls", "macros" ] }

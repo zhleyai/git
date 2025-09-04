@@ -2,6 +2,7 @@ mod config;
 mod http;
 mod ssh;
 mod auth;
+mod git_api;
 
 use actix_files::Files;
 use actix_web::{web, App, HttpServer};
@@ -55,9 +56,10 @@ async fn main() -> anyhow::Result<()> {
     };
 
     // Start SSH server in background
-    let ssh_service = repository_service.clone();
+    let ssh_repository_service = repository_service.clone();
+    let ssh_user_service = user_service.clone();
     tokio::spawn(async move {
-        if let Err(e) = ssh::start_ssh_server(ssh_service).await {
+        if let Err(e) = ssh::start_ssh_server(ssh_repository_service, ssh_user_service).await {
             eprintln!("SSH server error: {}", e);
         }
     });
@@ -98,6 +100,15 @@ async fn main() -> anyhow::Result<()> {
                             .service(auth::logout)
                             .service(auth::get_current_user)
                     )
+                    // Git operations routes
+                    .service(git_api::list_branches)
+                    .service(git_api::create_branch)
+                    .service(git_api::delete_branch)
+                    .service(git_api::list_tags)
+                    .service(git_api::create_tag)
+                    .service(git_api::create_commit)
+                    .service(git_api::merge_branches)
+                    .service(git_api::get_commit_history)
                     // Repository routes
                     .service(http::list_repositories)
                     .service(http::get_repository)

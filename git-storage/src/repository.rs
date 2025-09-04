@@ -26,6 +26,11 @@ impl RepositoryService {
         Self { db, blob_storage_path }
     }
 
+    /// Get database connection (for internal use)
+    pub fn get_db(&self) -> &DatabaseConnection {
+        &self.db
+    }
+
     /// Create a new repository
     pub async fn create_repository(
         &self,

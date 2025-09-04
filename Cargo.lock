@@ -1467,6 +1467,7 @@ dependencies = [
  "chrono",
  "git-protocol",
  "git-storage",
+ "rand 0.8.5",
  "russh",
  "russh-keys",
  "sea-orm",
@@ -1486,6 +1487,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "chrono",
+ "git-protocol",
  "sea-orm",
  "sea-orm-migration",
  "serde",
