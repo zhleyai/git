@@ -31,7 +31,7 @@ dependencies = [
  "actix-web",
  "bitflags",
  "bytes",
- "derive_more",
+ "derive_more 2.0.1",
  "futures-core",
  "http-range",
  "log",
@@ -57,7 +57,7 @@ dependencies = [
  "brotli",
  "bytes",
  "bytestring",
- "derive_more",
+ "derive_more 2.0.1",
  "encoding_rs",
  "flate2",
  "foldhash",
@@ -144,6 +144,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-session"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b671404ec72194d8af58c2bdaf51e3c477a0595056bd5010148405870dda8df2"
+dependencies = [
+ "actix-service",
+ "actix-utils",
+ "actix-web",
+ "anyhow",
+ "derive_more 0.99.20",
+ "serde",
+ "serde_json",
+ "tracing",
+]
+
+[[package]]
 name = "actix-utils"
 version = "3.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -172,7 +188,7 @@ dependencies = [
  "bytestring",
  "cfg-if",
  "cookie",
- "derive_more",
+ "derive_more 2.0.1",
  "encoding_rs",
  "foldhash",
  "futures-core",
@@ -463,6 +479,12 @@ name = "base16ct"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4c7f02d4ea65f2c1853089ffd8d2787bdbc63de2f0d29dedbcf8ccdfa0ccd4cf"
+
+[[package]]
+name = "base64"
+version = "0.20.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ea22880d78093b0cbe17c89f64a7d457941e65759157ec6cb31a31d652b05e5"
 
 [[package]]
 name = "base64"
@@ -768,12 +790,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2459377285ad874054d797f3ccebf984978aa39129f6eafde5cdc8315b612f8"
 
 [[package]]
+name = "convert_case"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6245d59a3e82a7fc217c5828a6692dbc6dfb63a0c8c90495621f7b9d79704a0e"
+
+[[package]]
 name = "cookie"
 version = "0.16.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e859cd57d0710d9e06c381b550c06e76992472a8c6d527aecd2fc673dcc231fb"
 dependencies = [
+ "aes-gcm",
+ "base64 0.20.0",
+ "hkdf",
+ "hmac",
  "percent-encoding",
+ "rand 0.8.5",
+ "sha2",
+ "subtle",
  "time",
  "version_check",
 ]
@@ -961,6 +996,19 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "derive_more"
+version = "0.99.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6edb4b64a43d977b8e99788fe3a04d483834fba1215a7e02caa415b626497f7f"
+dependencies = [
+ "convert_case",
+ "proc-macro2",
+ "quote",
+ "rustc_version",
+ "syn 2.0.106",
 ]
 
 [[package]]
@@ -1398,6 +1446,7 @@ name = "git-server"
 version = "0.1.0"
 dependencies = [
  "actix-files",
+ "actix-session",
  "actix-web",
  "anyhow",
  "async-trait",
