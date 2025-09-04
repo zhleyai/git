@@ -9,7 +9,10 @@ pub struct Model {
     pub repository_id: Uuid,
     pub object_type: String,
     pub size: i64,
-    pub content: Vec<u8>,
+    // For blobs, content is stored in filesystem; for commits/trees/tags, stored in DB
+    pub content: Option<Vec<u8>>,
+    // Path to blob file in local storage (only for blob objects)
+    pub blob_path: Option<String>,
     pub created_at: ChronoDateTimeWithTimeZone,
 }
 

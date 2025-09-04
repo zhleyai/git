@@ -5,7 +5,7 @@ mod ssh;
 use actix_files::Files;
 use actix_web::{web, App, HttpServer};
 use anyhow::Context;
-use git_storage::{init_db, run_migrations, RepositoryService};
+use git_storage::{init_db, run_migrations, RepositoryService, UserService};
 use std::sync::Arc;
 use tracing::{info, Level};
 use tracing_subscriber;
@@ -13,6 +13,7 @@ use tracing_subscriber;
 #[derive(Clone)]
 pub struct AppState {
     pub repository_service: Arc<RepositoryService>,
+    pub user_service: Arc<UserService>,
 }
 
 #[tokio::main]
@@ -37,11 +38,17 @@ async fn main() -> anyhow::Result<()> {
         .await
         .context("Failed to run migrations")?;
 
-    // Create repository service
-    let repository_service = Arc::new(RepositoryService::new(db));
+    // Create services
+    let blob_storage_path = std::env::var("BLOB_STORAGE_PATH")
+        .map(|p| std::path::PathBuf::from(p))
+        .ok();
+    
+    let repository_service = Arc::new(RepositoryService::new(db.clone(), blob_storage_path));
+    let user_service = Arc::new(UserService::new(db.clone()));
 
     let app_state = AppState {
         repository_service: repository_service.clone(),
+        user_service: user_service.clone(),
     };
 
     // Start SSH server in background
@@ -71,9 +78,15 @@ async fn main() -> anyhow::Result<()> {
             // API routes
             .service(
                 web::scope("/api")
+                    // Repository routes
                     .service(http::list_repositories)
                     .service(http::get_repository)
                     .service(http::create_repository)
+                    .service(http::get_user_repositories)
+                    // User routes
+                    .service(http::create_user)
+                    .service(http::list_users)
+                    .service(http::get_user)
             )
             // Static files for frontend
             .service(Files::new("/", "./frontend/dist").index_file("index.html"))

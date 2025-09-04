@@ -1,6 +1,6 @@
 use git_storage::RepositoryService;
 use std::sync::Arc;
-use tracing::{error, info};
+use tracing::info;
 
 pub async fn start_ssh_server(_repository_service: Arc<RepositoryService>) -> anyhow::Result<()> {
     let bind_address = std::env::var("SSH_BIND_ADDRESS")

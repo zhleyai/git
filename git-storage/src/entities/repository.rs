@@ -9,6 +9,8 @@ pub struct Model {
     pub name: String,
     pub description: Option<String>,
     pub default_branch: String,
+    pub owner_id: Uuid,
+    pub is_private: bool,
     pub created_at: ChronoDateTimeWithTimeZone,
     pub updated_at: ChronoDateTimeWithTimeZone,
 }
@@ -19,6 +21,12 @@ pub enum Relation {
     GitObjects,
     #[sea_orm(has_many = "super::git_ref::Entity")]
     GitRefs,
+    #[sea_orm(
+        belongs_to = "super::user::Entity",
+        from = "Column::OwnerId",
+        to = "super::user::Column::Id"
+    )]
+    User,
 }
 
 impl Related<super::git_object::Entity> for Entity {
@@ -30,6 +38,12 @@ impl Related<super::git_object::Entity> for Entity {
 impl Related<super::git_ref::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::GitRefs.def()
+    }
+}
+
+impl Related<super::user::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::User.def()
     }
 }
 
