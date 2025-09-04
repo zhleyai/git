@@ -16,3 +16,6 @@ chrono = { workspace = true }
 # Database
 sea-orm = { version = "0.12", features = [ "sqlx-sqlite", "runtime-tokio-rustls", "macros" ] }
 sea-orm-migration = "0.12"
+
+# Internal dependencies
+git-protocol = { path = "../git-protocol" }

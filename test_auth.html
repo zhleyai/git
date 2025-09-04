@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Git Server Authentication Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, button { padding: 10px; margin: 5px 0; font-size: 14px; }
+        input { width: 300px; }
+        button { background: #007cba; color: white; border: none; cursor: pointer; padding: 10px 20px; }
+        button:hover { background: #005a85; }
+        .result { margin: 20px 0; padding: 15px; border: 1px solid #ccc; background: #f5f5f5; }
+        .error { border-color: red; background: #ffe6e6; }
+        .success { border-color: green; background: #e6ffe6; }
+        .section { margin: 30px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Git Server Authentication Test</h1>
+    
+    <div class="section">
+        <h2>User Registration</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="regUsername">Username:</label>
+                <input type="text" id="regUsername" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="regEmail">Email:</label>
+                <input type="email" id="regEmail" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="regPassword">Password:</label>
+                <input type="password" id="regPassword" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="regFullName">Full Name:</label>
+                <input type="text" id="regFullName" name="full_name">
+            </div>
+            <button type="submit">Register</button>
+        </form>
+        <div id="registerResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="section">
+        <h2>User Login</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginUsername">Username or Email:</label>
+                <input type="text" id="loginUsername" name="username_or_email" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password:</label>
+                <input type="password" id="loginPassword" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <div id="loginResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="section">
+        <h2>Current User</h2>
+        <button id="getCurrentUser">Get Current User</button>
+        <button id="logout">Logout</button>
+        <div id="currentUserResult" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/auth';
+
+        // Register form
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch(`${API_BASE}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                
+                const resultDiv = document.getElementById('registerResult');
+                resultDiv.style.display = 'block';
+                resultDiv.className = `result ${result.success ? 'success' : 'error'}`;
+                resultDiv.innerHTML = `
+                    <h3>Registration Result</h3>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Message:</strong> ${result.message}</p>
+                    ${result.user ? `<p><strong>User:</strong> ${result.user.username} (${result.user.email})</p>` : ''}
+                `;
+            } catch (error) {
+                console.error('Registration error:', error);
+                document.getElementById('registerResult').innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        });
+
+        // Login form
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                    credentials: 'include' // Include cookies for session
+                });
+                const result = await response.json();
+                
+                const resultDiv = document.getElementById('loginResult');
+                resultDiv.style.display = 'block';
+                resultDiv.className = `result ${result.success ? 'success' : 'error'}`;
+                resultDiv.innerHTML = `
+                    <h3>Login Result</h3>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Message:</strong> ${result.message}</p>
+                    ${result.user ? `<p><strong>User:</strong> ${result.user.username} (${result.user.email})</p>` : ''}
+                `;
+            } catch (error) {
+                console.error('Login error:', error);
+                document.getElementById('loginResult').innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        });
+
+        // Get current user
+        document.getElementById('getCurrentUser').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${API_BASE}/me`, {
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                
+                const resultDiv = document.getElementById('currentUserResult');
+                resultDiv.style.display = 'block';
+                resultDiv.className = `result ${result.success ? 'success' : 'error'}`;
+                resultDiv.innerHTML = `
+                    <h3>Current User</h3>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    ${result.user ? `
+                        <p><strong>Username:</strong> ${result.user.username}</p>
+                        <p><strong>Email:</strong> ${result.user.email}</p>
+                        <p><strong>Full Name:</strong> ${result.user.full_name || 'Not provided'}</p>
+                        <p><strong>Admin:</strong> ${result.user.is_admin}</p>
+                        <p><strong>Created:</strong> ${result.user.created_at}</p>
+                    ` : `<p><strong>Message:</strong> ${result.message}</p>`}
+                `;
+            } catch (error) {
+                console.error('Current user error:', error);
+                document.getElementById('currentUserResult').innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        });
+
+        // Logout
+        document.getElementById('logout').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${API_BASE}/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                
+                const resultDiv = document.getElementById('currentUserResult');
+                resultDiv.style.display = 'block';
+                resultDiv.className = `result ${result.success ? 'success' : 'error'}`;
+                resultDiv.innerHTML = `
+                    <h3>Logout Result</h3>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Message:</strong> ${result.message}</p>
+                `;
+            } catch (error) {
+                console.error('Logout error:', error);
+                document.getElementById('currentUserResult').innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

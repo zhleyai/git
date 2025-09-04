@@ -2,12 +2,14 @@ pub mod entities;
 pub mod migrations;
 pub mod repository;
 pub mod user;
+pub mod git_ops;
 
 use anyhow::Result;
 use sea_orm::{Database, DatabaseConnection};
 
 pub use repository::*;
 pub use user::*;
+pub use git_ops::*;
 
 /// Initialize the database connection
 pub async fn init_db(database_url: &str) -> Result<DatabaseConnection> {
