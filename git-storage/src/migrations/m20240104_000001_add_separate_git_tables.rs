@@ -10,33 +10,27 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(Commit::Table)
+                    .table(Commits::Table)
                     .if_not_exists()
-                    .col(ColumnDef::new(Commit::Id).string().not_null().primary_key())
-                    .col(ColumnDef::new(Commit::RepositoryId).uuid().not_null())
-                    .col(ColumnDef::new(Commit::ParentIds).string())
-                    .col(ColumnDef::new(Commit::TreeId).string().not_null())
-                    .col(ColumnDef::new(Commit::AuthorName).string().not_null())
-                    .col(ColumnDef::new(Commit::AuthorEmail).string().not_null())
-                    .col(ColumnDef::new(Commit::AuthorDate).timestamp_with_time_zone().not_null())
-                    .col(ColumnDef::new(Commit::CommitterName).string().not_null())
-                    .col(ColumnDef::new(Commit::CommitterEmail).string().not_null())
-                    .col(ColumnDef::new(Commit::CommitterDate).timestamp_with_time_zone().not_null())
-                    .col(ColumnDef::new(Commit::Message).text().not_null())
-                    .col(ColumnDef::new(Commit::Content).binary().not_null())
-                    .col(ColumnDef::new(Commit::CreatedAt).timestamp_with_time_zone().not_null())
+                    .col(ColumnDef::new(Commits::Id).string().not_null().primary_key())
+                    .col(ColumnDef::new(Commits::RepositoryId).uuid().not_null())
+                    .col(ColumnDef::new(Commits::ParentIds).string())
+                    .col(ColumnDef::new(Commits::TreeId).string().not_null())
+                    .col(ColumnDef::new(Commits::AuthorName).string().not_null())
+                    .col(ColumnDef::new(Commits::AuthorEmail).string().not_null())
+                    .col(ColumnDef::new(Commits::AuthorDate).timestamp_with_time_zone().not_null())
+                    .col(ColumnDef::new(Commits::CommitterName).string().not_null())
+                    .col(ColumnDef::new(Commits::CommitterEmail).string().not_null())
+                    .col(ColumnDef::new(Commits::CommitterDate).timestamp_with_time_zone().not_null())
+                    .col(ColumnDef::new(Commits::Message).text().not_null())
+                    .col(ColumnDef::new(Commits::Content).binary().not_null())
+                    .col(ColumnDef::new(Commits::CreatedAt).timestamp_with_time_zone().not_null())
                     .foreign_key(
                         ForeignKey::create()
-                            .name("fk-commit-repository")
-                            .from(Commit::Table, Commit::RepositoryId)
+                            .name("fk-commits-repository")
+                            .from(Commits::Table, Commits::RepositoryId)
                             .to(Repository::Table, Repository::Id)
                             .on_delete(ForeignKeyAction::Cascade),
-                    )
-                    .index(
-                        Index::create()
-                            .name("idx-commit-repository")
-                            .table(Commit::Table)
-                            .col(Commit::RepositoryId),
                     )
                     .to_owned(),
             )
@@ -46,28 +40,28 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(Branch::Table)
+                    .table(Branches::Table)
                     .if_not_exists()
-                    .col(ColumnDef::new(Branch::Id).uuid().not_null().primary_key())
-                    .col(ColumnDef::new(Branch::RepositoryId).uuid().not_null())
-                    .col(ColumnDef::new(Branch::Name).string().not_null())
-                    .col(ColumnDef::new(Branch::CommitId).string().not_null())
-                    .col(ColumnDef::new(Branch::IsDefault).boolean().not_null().default(false))
-                    .col(ColumnDef::new(Branch::CreatedAt).timestamp_with_time_zone().not_null())
-                    .col(ColumnDef::new(Branch::UpdatedAt).timestamp_with_time_zone().not_null())
+                    .col(ColumnDef::new(Branches::Id).uuid().not_null().primary_key())
+                    .col(ColumnDef::new(Branches::RepositoryId).uuid().not_null())
+                    .col(ColumnDef::new(Branches::Name).string().not_null())
+                    .col(ColumnDef::new(Branches::CommitId).string().not_null())
+                    .col(ColumnDef::new(Branches::IsDefault).boolean().not_null().default(false))
+                    .col(ColumnDef::new(Branches::CreatedAt).timestamp_with_time_zone().not_null())
+                    .col(ColumnDef::new(Branches::UpdatedAt).timestamp_with_time_zone().not_null())
                     .foreign_key(
                         ForeignKey::create()
-                            .name("fk-branch-repository")
-                            .from(Branch::Table, Branch::RepositoryId)
+                            .name("fk-branches-repository")
+                            .from(Branches::Table, Branches::RepositoryId)
                             .to(Repository::Table, Repository::Id)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
                     .index(
                         Index::create()
-                            .name("idx-branch-repo-name")
-                            .table(Branch::Table)
-                            .col(Branch::RepositoryId)
-                            .col(Branch::Name)
+                            .name("idx-branches-repo-name")
+                            .table(Branches::Table)
+                            .col(Branches::RepositoryId)
+                            .col(Branches::Name)
                             .unique(),
                     )
                     .to_owned(),
@@ -78,35 +72,35 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(Tag::Table)
+                    .table(Tags::Table)
                     .if_not_exists()
-                    .col(ColumnDef::new(Tag::Id).uuid().not_null().primary_key())
-                    .col(ColumnDef::new(Tag::RepositoryId).uuid().not_null())
-                    .col(ColumnDef::new(Tag::Name).string().not_null())
-                    .col(ColumnDef::new(Tag::TargetId).string().not_null())
-                    .col(ColumnDef::new(Tag::TargetType).string().not_null())
-                    .col(ColumnDef::new(Tag::TagObjectId).string())
-                    .col(ColumnDef::new(Tag::TaggerName).string())
-                    .col(ColumnDef::new(Tag::TaggerEmail).string())
-                    .col(ColumnDef::new(Tag::TaggerDate).timestamp_with_time_zone())
-                    .col(ColumnDef::new(Tag::Message).text())
-                    .col(ColumnDef::new(Tag::Content).binary())
-                    .col(ColumnDef::new(Tag::IsLightweight).boolean().not_null().default(true))
-                    .col(ColumnDef::new(Tag::CreatedAt).timestamp_with_time_zone().not_null())
-                    .col(ColumnDef::new(Tag::UpdatedAt).timestamp_with_time_zone().not_null())
+                    .col(ColumnDef::new(Tags::Id).uuid().not_null().primary_key())
+                    .col(ColumnDef::new(Tags::RepositoryId).uuid().not_null())
+                    .col(ColumnDef::new(Tags::Name).string().not_null())
+                    .col(ColumnDef::new(Tags::TargetId).string().not_null())
+                    .col(ColumnDef::new(Tags::TargetType).string().not_null())
+                    .col(ColumnDef::new(Tags::TagObjectId).string())
+                    .col(ColumnDef::new(Tags::TaggerName).string())
+                    .col(ColumnDef::new(Tags::TaggerEmail).string())
+                    .col(ColumnDef::new(Tags::TaggerDate).timestamp_with_time_zone())
+                    .col(ColumnDef::new(Tags::Message).text())
+                    .col(ColumnDef::new(Tags::Content).binary())
+                    .col(ColumnDef::new(Tags::IsLightweight).boolean().not_null().default(true))
+                    .col(ColumnDef::new(Tags::CreatedAt).timestamp_with_time_zone().not_null())
+                    .col(ColumnDef::new(Tags::UpdatedAt).timestamp_with_time_zone().not_null())
                     .foreign_key(
                         ForeignKey::create()
-                            .name("fk-tag-repository")
-                            .from(Tag::Table, Tag::RepositoryId)
+                            .name("fk-tags-repository")
+                            .from(Tags::Table, Tags::RepositoryId)
                             .to(Repository::Table, Repository::Id)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
                     .index(
                         Index::create()
-                            .name("idx-tag-repo-name")
-                            .table(Tag::Table)
-                            .col(Tag::RepositoryId)
-                            .col(Tag::Name)
+                            .name("idx-tags-repo-name")
+                            .table(Tags::Table)
+                            .col(Tags::RepositoryId)
+                            .col(Tags::Name)
                             .unique(),
                     )
                     .to_owned(),
@@ -117,26 +111,20 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(Tree::Table)
+                    .table(Trees::Table)
                     .if_not_exists()
-                    .col(ColumnDef::new(Tree::Id).string().not_null().primary_key())
-                    .col(ColumnDef::new(Tree::RepositoryId).uuid().not_null())
-                    .col(ColumnDef::new(Tree::Entries).text().not_null())
-                    .col(ColumnDef::new(Tree::Size).big_integer().not_null())
-                    .col(ColumnDef::new(Tree::Content).binary().not_null())
-                    .col(ColumnDef::new(Tree::CreatedAt).timestamp_with_time_zone().not_null())
+                    .col(ColumnDef::new(Trees::Id).string().not_null().primary_key())
+                    .col(ColumnDef::new(Trees::RepositoryId).uuid().not_null())
+                    .col(ColumnDef::new(Trees::Entries).text().not_null())
+                    .col(ColumnDef::new(Trees::Size).big_integer().not_null())
+                    .col(ColumnDef::new(Trees::Content).binary().not_null())
+                    .col(ColumnDef::new(Trees::CreatedAt).timestamp_with_time_zone().not_null())
                     .foreign_key(
                         ForeignKey::create()
-                            .name("fk-tree-repository")
-                            .from(Tree::Table, Tree::RepositoryId)
+                            .name("fk-trees-repository")
+                            .from(Trees::Table, Trees::RepositoryId)
                             .to(Repository::Table, Repository::Id)
                             .on_delete(ForeignKeyAction::Cascade),
-                    )
-                    .index(
-                        Index::create()
-                            .name("idx-tree-repository")
-                            .table(Tree::Table)
-                            .col(Tree::RepositoryId),
                     )
                     .to_owned(),
             )
@@ -147,16 +135,16 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table(Tree::Table).to_owned())
+            .drop_table(Table::drop().table(Trees::Table).to_owned())
             .await?;
         manager
-            .drop_table(Table::drop().table(Tag::Table).to_owned())
+            .drop_table(Table::drop().table(Tags::Table).to_owned())
             .await?;
         manager
-            .drop_table(Table::drop().table(Branch::Table).to_owned())
+            .drop_table(Table::drop().table(Branches::Table).to_owned())
             .await?;
         manager
-            .drop_table(Table::drop().table(Commit::Table).to_owned())
+            .drop_table(Table::drop().table(Commits::Table).to_owned())
             .await?;
 
         Ok(())
@@ -170,7 +158,7 @@ enum Repository {
 }
 
 #[derive(Iden)]
-enum Commit {
+enum Commits {
     Table,
     Id,
     RepositoryId,
@@ -188,7 +176,7 @@ enum Commit {
 }
 
 #[derive(Iden)]
-enum Branch {
+enum Branches {
     Table,
     Id,
     RepositoryId,
@@ -200,7 +188,7 @@ enum Branch {
 }
 
 #[derive(Iden)]
-enum Tag {
+enum Tags {
     Table,
     Id,
     RepositoryId,
@@ -219,7 +207,7 @@ enum Tag {
 }
 
 #[derive(Iden)]
-enum Tree {
+enum Trees {
     Table,
     Id,
     RepositoryId,
