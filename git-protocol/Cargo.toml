@@ -1,0 +1,21 @@
+[package]
+name = "git-protocol"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Workspace dependencies
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+
+# Git protocol specific
+bytes = "1.4"
+nom = "7.1"
+flate2 = "1.0"
+sha1 = "0.10"
+hex = "0.4"
