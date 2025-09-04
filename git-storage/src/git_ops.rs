@@ -263,7 +263,7 @@ impl GitOperations {
         let source_commit = self.get_ref(repository_id, &source_ref).await?
             .ok_or_else(|| anyhow!("Source branch '{}' not found", request.source_branch))?;
 
-        let target_commit = self.get_ref(repository_id, &target_ref).await?
+        let _target_commit = self.get_ref(repository_id, &target_ref).await?
             .ok_or_else(|| anyhow!("Target branch '{}' not found", request.target_branch))?;
 
         // For now, just do a fast-forward merge (update target to source)
@@ -279,7 +279,7 @@ impl GitOperations {
         &self,
         repository_id: Uuid,
         branch_name: String,
-        limit: Option<usize>,
+        _limit: Option<usize>,
     ) -> Result<Vec<Commit>> {
         let ref_name = format!("refs/heads/{}", branch_name);
         let branch_ref = self.get_ref(repository_id, &ref_name).await?

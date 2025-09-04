@@ -32,7 +32,7 @@ pub async fn list_branches(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse> {
     // Check authentication
-    let user_id = match get_authenticated_user(&session) {
+    let _user_id = match get_authenticated_user(&session) {
         Some(id) => id,
         None => {
             return Ok(HttpResponse::Unauthorized().json(ApiResponse::<()> {
@@ -55,9 +55,9 @@ pub async fn list_branches(
     };
 
     // Check repository access (simplified - in production, check permissions)
-    match state.repository_service.get_repository(repo_id).await {
+    match state.repository_service.get_repository_by_id(repo_id).await {
         Ok(Some(_)) => {
-            let git_ops = GitOperations::new((*state.repository_service).clone());
+            let git_ops = GitOperations::new(state.repository_service.as_ref().clone());
             match git_ops.list_branches(repo_id).await {
                 Ok(branches) => Ok(HttpResponse::Ok().json(ApiResponse {
                     success: true,
@@ -92,7 +92,7 @@ pub async fn create_branch(
     session: Session,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse> {
-    let user_id = match get_authenticated_user(&session) {
+    let _user_id = match get_authenticated_user(&session) {
         Some(id) => id,
         None => {
             return Ok(HttpResponse::Unauthorized().json(ApiResponse::<()> {
@@ -125,7 +125,7 @@ pub async fn create_branch(
         }));
     }
 
-    let git_ops = GitOperations::new((*state.repository_service).clone());
+    let git_ops = GitOperations::new(state.repository_service.as_ref().clone());
     match git_ops.create_branch(repo_id, req.name, req.start_commit).await {
         Ok(branch_info) => Ok(HttpResponse::Created().json(ApiResponse {
             success: true,
@@ -147,7 +147,7 @@ pub async fn delete_branch(
     session: Session,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse> {
-    let user_id = match get_authenticated_user(&session) {
+    let _user_id = match get_authenticated_user(&session) {
         Some(id) => id,
         None => {
             return Ok(HttpResponse::Unauthorized().json(ApiResponse::<()> {
@@ -170,7 +170,7 @@ pub async fn delete_branch(
         }
     };
 
-    let git_ops = GitOperations::new((*state.repository_service).clone());
+    let git_ops = GitOperations::new(state.repository_service.as_ref().clone());
     match git_ops.delete_branch(repo_id, branch_name).await {
         Ok(_) => Ok(HttpResponse::Ok().json(ApiResponse::<()> {
             success: true,
@@ -192,7 +192,7 @@ pub async fn list_tags(
     session: Session,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse> {
-    let user_id = match get_authenticated_user(&session) {
+    let _user_id = match get_authenticated_user(&session) {
         Some(id) => id,
         None => {
             return Ok(HttpResponse::Unauthorized().json(ApiResponse::<()> {
@@ -214,7 +214,7 @@ pub async fn list_tags(
         }
     };
 
-    let git_ops = GitOperations::new((*state.repository_service).clone());
+    let git_ops = GitOperations::new(state.repository_service.as_ref().clone());
     match git_ops.list_tags(repo_id).await {
         Ok(tags) => Ok(HttpResponse::Ok().json(ApiResponse {
             success: true,
@@ -237,7 +237,7 @@ pub async fn create_tag(
     session: Session,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse> {
-    let user_id = match get_authenticated_user(&session) {
+    let _user_id = match get_authenticated_user(&session) {
         Some(id) => id,
         None => {
             return Ok(HttpResponse::Unauthorized().json(ApiResponse::<()> {
@@ -269,7 +269,7 @@ pub async fn create_tag(
         }));
     }
 
-    let git_ops = GitOperations::new((*state.repository_service).clone());
+    let git_ops = GitOperations::new(state.repository_service.as_ref().clone());
     match git_ops.create_lightweight_tag(repo_id, req.name, req.target_commit).await {
         Ok(tag_info) => Ok(HttpResponse::Created().json(ApiResponse {
             success: true,
@@ -292,7 +292,7 @@ pub async fn create_commit(
     session: Session,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse> {
-    let user_id = match get_authenticated_user(&session) {
+    let _user_id = match get_authenticated_user(&session) {
         Some(id) => id,
         None => {
             return Ok(HttpResponse::Unauthorized().json(ApiResponse::<()> {
@@ -314,7 +314,7 @@ pub async fn create_commit(
         }
     };
 
-    let git_ops = GitOperations::new((*state.repository_service).clone());
+    let git_ops = GitOperations::new(state.repository_service.as_ref().clone());
     match git_ops.create_commit(repo_id, body.into_inner()).await {
         Ok(commit_hash) => Ok(HttpResponse::Created().json(ApiResponse {
             success: true,
@@ -337,7 +337,7 @@ pub async fn merge_branches(
     session: Session,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse> {
-    let user_id = match get_authenticated_user(&session) {
+    let _user_id = match get_authenticated_user(&session) {
         Some(id) => id,
         None => {
             return Ok(HttpResponse::Unauthorized().json(ApiResponse::<()> {
@@ -359,7 +359,7 @@ pub async fn merge_branches(
         }
     };
 
-    let git_ops = GitOperations::new((*state.repository_service).clone());
+    let git_ops = GitOperations::new(state.repository_service.as_ref().clone());
     match git_ops.merge_branch(repo_id, body.into_inner()).await {
         Ok(merge_commit) => Ok(HttpResponse::Ok().json(ApiResponse {
             success: true,
@@ -382,7 +382,7 @@ pub async fn get_commit_history(
     session: Session,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse> {
-    let user_id = match get_authenticated_user(&session) {
+    let _user_id = match get_authenticated_user(&session) {
         Some(id) => id,
         None => {
             return Ok(HttpResponse::Unauthorized().json(ApiResponse::<()> {
@@ -405,7 +405,7 @@ pub async fn get_commit_history(
         }
     };
 
-    let git_ops = GitOperations::new((*state.repository_service).clone());
+    let git_ops = GitOperations::new(state.repository_service.as_ref().clone());
     match git_ops.get_commit_history(repo_id, branch_name, query.limit).await {
         Ok(commits) => Ok(HttpResponse::Ok().json(ApiResponse {
             success: true,

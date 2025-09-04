@@ -3,6 +3,7 @@ use anyhow::{anyhow, Result};
 use std::str;
 
 /// Git protocol handler implementing the Git wire protocol
+#[derive(Clone)]
 pub struct ProtocolHandler;
 
 impl ProtocolHandler {
